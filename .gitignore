@@ -1,0 +1,35 @@
+# Django-specific ignores
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+*.py[co]
+*.so
+*.mo
+
+# Ignore migrations
+*/migrations/
+
+# Ignore environment variables file
+.env
+
+# Ignore virtual environment folder
+venv/
+
+# Ignore the database
+*.sqlite3
+
+# Ignore IDE configurations
+.idea/
+.vscode/
+
+# Ignore static and media files (if not tracking them)
+staticfiles/
+media/
+
+# Ignore other unnecessary files
+*.swp
+*.swo

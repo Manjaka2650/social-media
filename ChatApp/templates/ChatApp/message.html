@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Message {{user}}</title>
+  </head>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chat-header {
+      background-color: #0084ff;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .back-button {
+      float: left;
+      cursor: pointer;
+    }
+
+    .user-name {
+      font-weight: bold;
+    }
+
+    .chat-container {
+      max-width: 400px;
+      margin: 10px auto;
+    }
+
+    .message {
+      max-width: 70%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      clear: both;
+    }
+
+    .sent {
+      background-color: green;
+      color: #fff;
+      float: right;
+    }
+
+    .received {
+      /* background-color: #e0e0e0; */
+      background-color: #e0e0e0;
+      color: #000;
+      float: left;
+    }
+
+    .input-container {
+      background-color: #fff;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .message-input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .send-button {
+      background-color: green;
+      color: #fff;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .conteneur-all {
+      display: grid;
+    }
+    .contenue {
+      display: inline-block;
+    }
+  </style>
+  <body>
+    <div>
+      {{user}}+ {{user2}}
+      <h1>Message</h1>
+      <div class="chat-container">
+        <div id="conteneur">
+          {% for message in messages %} {% if message.sender == request.user %}
+
+          <div class="message sent">{{message.content}}</div>
+
+          {% else %}
+          <div class="message received">{{message.content}}</div>
+
+          {% endif %} {% endfor %}
+        </div>
+        <form
+          method="post"
+          onsubmit="handleSubmit(event)"
+          action="{% url 'create-room' %}"
+        >
+          {% csrf_token %}
+          <div class="input-container">
+            <input type="file" id="fileInput" class="file-input" />
+            <input
+              type="text"
+              id="message"
+              placeholder="Type your message..."
+              name="message"
+              class="message-input"
+            />
+            <button type="submit" class="send-button">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+      const websocketProtocol =
+        window.location.protocol === "https" ? "wss" : "ws";
+      const wsEndPoint = `${websocketProtocol}://${window.location.host}/ws/notification/{{room_name}}`;
+      const socket = new WebSocket(wsEndPoint);
+      socket.onopen = (event) => {
+        console.log("Websocket connected");
+      };
+      socket.onclose = (event) => {
+        console.log("closed");
+      };
+      function handleSubmit(event) {
+        event.preventDefault();
+        const message = document.getElementById("message").value;
+        socket.send(
+          JSON.stringify({
+            message: message,
+            room_name: "{{room_name}}",
+            sender: "{{user}}",
+          })
+        );
+      }
+
+      socket.addEventListener("message", (event) => {
+        const messagData = JSON.parse(event.data)["message"];
+        var sender = messagData["sender"];
+        // alert(sender);
+        var message = messagData["message"];
+        if (sender == "{{request.user.username}}")
+          console.log("{{request.user.username}}");
+        document.getElementById("message").value = "";
+        let messagdiv = document.getElementById("conteneur");
+        if (sender == "{{request.user.username}}") {
+          messagdiv.innerHTML += `<div class='message sent'>${message}</div>`;
+        } else {
+          messagdiv.innerHTML += `<div class='message received'>${message}</div>`;
+        }
+      });
+    </script>
+  </body>
+</html>

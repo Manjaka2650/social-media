@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Create room</title>
+  </head>
+  <body>
+    <div>
+      {% for m in mess %}
+      <p>{{m.content}}</p>
+
+      {% if m.video %}
+
+      <video width="400" height="300" controls>
+        <source src="{{m.video.url}}" />
+      </video>
+      {% endif %} {% endfor %}
+    </div>
+  </body>
+</html>
